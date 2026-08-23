@@ -1,0 +1,20 @@
+{
+  "name": "codex-context-file",
+  "interface": {
+    "displayName": "Codex Context File"
+  },
+  "plugins": [
+    {
+      "name": "context-file",
+      "source": {
+        "source": "local",
+        "path": "./plugins/context-file"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

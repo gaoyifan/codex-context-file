@@ -1,0 +1,27 @@
+{
+  "name": "context-file",
+  "version": "0.1.0",
+  "description": "Load trusted local text files directly into a Codex turn by path or glob pattern.",
+  "author": {
+    "name": "Yifan Gao",
+    "email": "git@yfgao.com",
+    "url": "https://github.com/gaoyifan"
+  },
+  "homepage": "https://github.com/gaoyifan/codex-context-file",
+  "repository": "https://github.com/gaoyifan/codex-context-file",
+  "license": "MIT",
+  "keywords": ["context", "files", "documents", "glob"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Context File",
+    "shortDescription": "Load local text files into a Codex turn.",
+    "longDescription": "Load one or more trusted UTF-8 text files directly into model context without a file-reading tool call. Supports paths and shell-style glob patterns.",
+    "developerName": "Yifan Gao",
+    "category": "Productivity",
+    "capabilities": ["Interactive"],
+    "websiteURL": "https://github.com/gaoyifan/codex-context-file",
+    "defaultPrompt": [
+      "$context-file docs/*.md\nSummarize these documents."
+    ]
+  }
+}
