@@ -1,0 +1,6 @@
+interface:
+  display_name: "Context File"
+  short_description: "Load files only via explicit $context-file invocation."
+
+policy:
+  allow_implicit_invocation: false

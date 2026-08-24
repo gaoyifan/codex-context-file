@@ -1,6 +1,6 @@
 ---
 name: context-file
-description: Load trusted local UTF-8 text files directly into the current Codex turn when the user invokes $context-file with a path or glob pattern.
+description: Explicit-only loader for trusted local UTF-8 text files. Use only when the user's message begins with `$context-file` followed by a path or glob; never invoke it for ordinary file-reading or context-loading requests.
 ---
 
 Use the first line as `$context-file <path-or-glob>`. Patterns support `*`, `?`,
