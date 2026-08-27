@@ -1,23 +1,24 @@
 import json
 import subprocess
-import sys
 import tempfile
 import unittest
 from pathlib import Path
 
 
 PLUGIN_ROOT = Path(__file__).parents[1] / "plugins" / "context-file"
-SCRIPT = PLUGIN_ROOT / "scripts" / "load_context.py"
+HOOKS = json.loads((PLUGIN_ROOT / "hooks" / "hooks.json").read_text())
+HOOK_COMMAND = HOOKS["hooks"]["UserPromptSubmit"][0]["hooks"][0]["command"]
 
 
 class LoadContextTest(unittest.TestCase):
     def run_hook(self, prompt: str, cwd: Path) -> dict | None:
         result = subprocess.run(
-            [sys.executable, str(SCRIPT)],
+            HOOK_COMMAND.replace("${PLUGIN_ROOT}", str(PLUGIN_ROOT)),
             input=json.dumps({"prompt": prompt, "cwd": str(cwd)}),
             text=True,
             capture_output=True,
             check=True,
+            shell=True,
         )
         return json.loads(result.stdout) if result.stdout else None
 

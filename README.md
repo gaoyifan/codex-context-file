@@ -12,6 +12,8 @@ codex plugin add context-file@codex-context-file
 ```
 
 Start a new Codex thread. On first use, review and trust the plugin hook.
+The hook requires [`uv`](https://docs.astral.sh/uv/) on `PATH`; it uses uv to
+provide its Python runtime.
 
 ## Use
 
@@ -44,6 +46,6 @@ also fit within the selected model's context window.
 ## Development
 
 ```sh
-python3 -m unittest discover -s tests
-python3 ~/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py plugins/context-file
+uv run -m unittest discover -s tests
+uv run --with pyyaml ~/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py plugins/context-file
 ```
