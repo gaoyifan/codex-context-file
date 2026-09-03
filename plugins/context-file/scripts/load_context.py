@@ -8,9 +8,13 @@ from pathlib import Path
 
 payload = json.load(sys.stdin)
 prompt_lines = payload["prompt"].splitlines()
-prefix = "$context-file "
+prefixes = ("$context-file ", "$context-file:context-file ")
 
-if not prompt_lines or not prompt_lines[0].startswith(prefix):
+prefix = next(
+    (prefix for prefix in prefixes if prompt_lines and prompt_lines[0].startswith(prefix)),
+    None,
+)
+if prefix is None:
     raise SystemExit(0)
 
 raw_pattern = prompt_lines[0].removeprefix(prefix).strip()

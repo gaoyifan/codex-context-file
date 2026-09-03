@@ -37,6 +37,18 @@ class LoadContextTest(unittest.TestCase):
             self.assertIn("BETA", context)
             self.assertNotIn("IGNORED", context)
 
+    def test_namespaced_skill_invocation_loads_matching_files(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "context.md").write_text("NAMESPACED", encoding="utf-8")
+
+            output = self.run_hook("$context-file:context-file *.md", root)
+
+            self.assertIn(
+                "NAMESPACED",
+                output["hookSpecificOutput"]["additionalContext"],
+            )
+
     def test_recursive_glob_loads_nested_file(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
