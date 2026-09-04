@@ -13,7 +13,8 @@ codex plugin add context-file@codex-context-file
 
 Start a new Codex thread. On first use, review and trust the plugin hook.
 The hook requires [`uv`](https://docs.astral.sh/uv/) on `PATH`; it uses uv to
-provide its Python runtime.
+provide its Python runtime and the `pathspec` dependency. The first invocation
+may need network access to download them.
 
 ## Use
 
@@ -32,9 +33,29 @@ $context-file docs/*.md
 Compare these documents.
 ```
 
+Combine multiple paths or patterns with spaces; quote paths containing spaces:
+
+```text
+$context-file docs/*.md **/*.rs "design notes/*.md"
+Compare the documentation with the Rust implementation.
+```
+
 Patterns support `*`, `?`, `[]`, and recursive `**`. Relative paths are resolved
-from the active Codex working directory. Multiple files are loaded in sorted path
-order, and each document is wrapped with markers containing its absolute path.
+from the active Codex working directory. Matches from all patterns are combined,
+deduplicated, and loaded in sorted path order. Each document is wrapped with
+markers containing its absolute path.
+
+Matches are filtered using `.gitignore`, including nested rules and `!`
+exceptions. Rules apply to explicitly named and Git-tracked files too, and work
+without a Git repository. Each matched path inherits `.gitignore` rules from its
+ancestors, stopping at the nearest repository root (a directory containing
+`.git`), or the filesystem root outside repositories. Nested rules override
+parent rules, but files inside an ignored directory cannot be re-included unless
+the directory itself is re-included. Global Git ignores and `.git/info/exclude`
+are not used.
+
+The turn is blocked if no files remain after filtering, or if a required
+`.gitignore` or selected file cannot be read as UTF-8.
 
 ## How it works
 
