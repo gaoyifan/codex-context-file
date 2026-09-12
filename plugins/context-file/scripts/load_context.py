@@ -14,6 +14,9 @@ from pathlib import Path
 from pathspec import GitIgnoreSpec
 
 
+IGNORE_FILENAMES = (".gitignore", ".contextignore")
+
+
 def is_ignored(path, rules, *, directory=False):
     ignored = False
     for base, spec in rules:
@@ -34,10 +37,13 @@ def directory_rules(directory):
         if parent_ignored or is_ignored(directory, rules, directory=True):
             return rules, True
 
-    ignore_file = directory / ".gitignore"
-    if ignore_file.is_file():
-        spec = GitIgnoreSpec.from_lines(ignore_file.read_text(encoding="utf-8").splitlines())
-        rules = (*rules, (directory, spec))
+    lines = []
+    for filename in IGNORE_FILENAMES:
+        ignore_file = directory / filename
+        if ignore_file.is_file():
+            lines.extend(ignore_file.read_text(encoding="utf-8").splitlines())
+    if lines:
+        rules = (*rules, (directory, GitIgnoreSpec.from_lines(lines)))
     return rules, False
 
 
@@ -97,7 +103,10 @@ if not paths:
         json.dumps(
             {
                 "decision": "block",
-                "reason": f"No files matched context pattern after .gitignore filtering: {raw_pattern}",
+                "reason": (
+                    "No files matched context pattern after "
+                    f".gitignore/.contextignore filtering: {raw_pattern}"
+                ),
             },
             ensure_ascii=False,
         )

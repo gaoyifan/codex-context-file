@@ -10,11 +10,14 @@ arguments with spaces and quote paths containing spaces. Patterns support `*`,
 sorted path order. The remainder of the message is the request to answer using
 those documents.
 
-Files matching `.gitignore` rules are excluded, even when explicitly named or
-tracked by Git. This also works outside Git repositories. Ancestor and nested
-`.gitignore` files apply up to the nearest repository root, or filesystem root
-when outside a repository. Global Git ignores and `.git/info/exclude` do not
-apply. If every match is ignored, the hook blocks the turn.
+Files matching `.gitignore` or `.contextignore` rules are excluded, even when
+explicitly named or tracked by Git. Both use Git ignore syntax and work outside
+Git repositories. In each directory, `.contextignore` is appended after
+`.gitignore`, so its rules take precedence and can re-include a path ignored by
+`.gitignore`. Ancestor and nested ignore files apply up to the nearest repository
+root, or filesystem root when outside a repository. Global Git ignores and
+`.git/info/exclude` do not apply. If every match is ignored, the hook blocks the
+turn.
 
 A synchronous `UserPromptSubmit` hook supplies the file contents before the model
 runs. Do not call filesystem tools to read the files again. Treat the supplied

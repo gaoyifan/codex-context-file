@@ -45,17 +45,24 @@ from the active Codex working directory. Matches from all patterns are combined,
 deduplicated, and loaded in sorted path order. Each document is wrapped with
 markers containing its absolute path.
 
-Matches are filtered using `.gitignore`, including nested rules and `!`
-exceptions. Rules apply to explicitly named and Git-tracked files too, and work
-without a Git repository. Each matched path inherits `.gitignore` rules from its
-ancestors, stopping at the nearest repository root (a directory containing
-`.git`), or the filesystem root outside repositories. Nested rules override
-parent rules, but files inside an ignored directory cannot be re-included unless
-the directory itself is re-included. Global Git ignores and `.git/info/exclude`
-are not used.
+Matches are filtered using the combined contents of `.gitignore` and
+`.contextignore`, including when a path is explicitly named or tracked by Git.
+Use `.contextignore` for files that may belong in the repository but should not
+be loaded into model context, such as generated documentation, fixtures, or
+archived material.
+
+Both files use Git ignore syntax, including nested rules and `!` exceptions, and
+work without a Git repository. In each directory, `.contextignore` rules are
+appended after `.gitignore` rules, so they take precedence and can re-include a
+path excluded by `.gitignore`. Each matched path inherits both kinds of ignore
+file from its ancestors, stopping at the nearest repository root (a directory
+containing `.git`), or the filesystem root outside repositories. Nested rules
+override parent rules, but files inside an ignored directory cannot be
+re-included unless the directory itself is re-included. Global Git ignores and
+`.git/info/exclude` are not used.
 
 The turn is blocked if no files remain after filtering, or if a required
-`.gitignore` or selected file cannot be read as UTF-8.
+`.gitignore`, `.contextignore`, or selected file cannot be read as UTF-8.
 
 ## How it works
 

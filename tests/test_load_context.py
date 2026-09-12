@@ -151,6 +151,54 @@ class LoadContextTest(unittest.TestCase):
             self.assertNotIn("SKIP", context)
             self.assertNotIn("LOCAL", context)
 
+    def test_nested_contextignore_uses_gitignore_syntax(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            nested = root / "docs"
+            nested.mkdir()
+            (root / ".contextignore").write_text(
+                "*.md\ngenerated/\n", encoding="utf-8"
+            )
+            (nested / ".contextignore").write_text(
+                "!keep.md\n/local.txt\n", encoding="utf-8"
+            )
+            (nested / "keep.md").write_text("KEEP", encoding="utf-8")
+            (nested / "skip.md").write_text("SKIP", encoding="utf-8")
+            (nested / "local.txt").write_text("LOCAL", encoding="utf-8")
+            (nested / "sub").mkdir()
+            (nested / "sub" / "local.txt").write_text("NESTED", encoding="utf-8")
+            (nested / "generated").mkdir()
+            (nested / "generated" / "unreadable.txt").write_bytes(b"\xff")
+
+            output = self.run_hook("$context-file **/*.*", nested)
+            context = output["hookSpecificOutput"]["additionalContext"]
+
+            self.assertIn("KEEP", context)
+            self.assertIn("NESTED", context)
+            self.assertNotIn("SKIP", context)
+            self.assertNotIn("LOCAL", context)
+            self.assertNotIn("generated", context)
+
+    def test_contextignore_overrides_gitignore(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / ".gitignore").write_text("git.md\n", encoding="utf-8")
+            (root / ".contextignore").write_text(
+                "context.md\n!git.md\n", encoding="utf-8"
+            )
+            (root / "git.md").write_text("REINCLUDED", encoding="utf-8")
+            (root / "context.md").write_text(
+                "OMIT_BY_CONTEXTIGNORE", encoding="utf-8"
+            )
+            (root / "keep.md").write_text("KEEP", encoding="utf-8")
+
+            output = self.run_hook("$context-file *.md", root)
+            context = output["hookSpecificOutput"]["additionalContext"]
+
+            self.assertIn("KEEP", context)
+            self.assertIn("REINCLUDED", context)
+            self.assertNotIn("OMIT_BY_CONTEXTIGNORE", context)
+
     def test_explicit_ignored_file_blocks_turn(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -160,7 +208,9 @@ class LoadContextTest(unittest.TestCase):
             output = self.run_hook("$context-file skip.md", root)
 
             self.assertEqual(output["decision"], "block")
-            self.assertIn("after .gitignore filtering", output["reason"])
+            self.assertIn(
+                "after .gitignore/.contextignore filtering", output["reason"]
+            )
 
     def test_tracked_files_filtered_but_git_excludes_not_used(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
