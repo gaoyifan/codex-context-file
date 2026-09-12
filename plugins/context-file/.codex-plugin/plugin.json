@@ -1,6 +1,6 @@
 {
   "name": "context-file",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Load trusted local text files directly into a Codex turn by path or glob pattern.",
   "author": {
     "name": "Yifan Gao",
